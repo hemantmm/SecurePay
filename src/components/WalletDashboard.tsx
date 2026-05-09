@@ -55,6 +55,8 @@ export default function WalletDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [data, setData] = useState<WalletAnalysisResponse | null>(null);
+  const [showAllRecommendations, setShowAllRecommendations] = useState(false);
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -74,6 +76,8 @@ export default function WalletDashboard() {
       }
 
       setData(payload);
+      setShowAllRecommendations(false);
+      setShowAllTransactions(false);
     } catch (err) {
       setData(null);
       setError(err instanceof Error ? err.message : 'Analysis failed');
@@ -153,10 +157,6 @@ export default function WalletDashboard() {
 
             <div className="metric-row">
               <div className="metric">
-                <span>Total transactions</span>
-                <strong>{data.totalTransactions}</strong>
-              </div>
-              <div className="metric">
                 <span>Total volume</span>
                 <strong>{formatSol(data.totalVolume)}</strong>
               </div>
@@ -183,9 +183,20 @@ export default function WalletDashboard() {
           </article>
 
           <article className="panel full">
-            <SectionTitle title="Recommendations" subtitle="The app summarizes why the wallet is being scored the way it is." />
+            <div className="section-header">
+              <SectionTitle title="Recommendations" subtitle="The app summarizes why the wallet is being scored the way it is." />
+              {data.trustScore.recommendations.length > 2 ? (
+                <button
+                  type="button"
+                  className="section-toggle"
+                  onClick={() => setShowAllRecommendations((current) => !current)}
+                >
+                  {showAllRecommendations ? 'Show fewer' : 'Show more'}
+                </button>
+              ) : null}
+            </div>
             <div className="recommendation-list">
-              {data.trustScore.recommendations.map((item) => (
+              {data.trustScore.recommendations.slice(0, showAllRecommendations ? undefined : 2).map((item) => (
                 <div key={item} className="recommendation-item">{item}</div>
               ))}
             </div>
@@ -206,7 +217,18 @@ export default function WalletDashboard() {
           ) : null}
 
           <article className="panel full">
-            <SectionTitle title="Recent transactions" subtitle="Latest 20 transactions from the wallet history" />
+            <div className="section-header">
+              <SectionTitle title="Recent transactions" subtitle="Latest 20 transactions from the wallet history" />
+              {data.transactions.length > 2 ? (
+                <button
+                  type="button"
+                  className="section-toggle"
+                  onClick={() => setShowAllTransactions((current) => !current)}
+                >
+                  {showAllTransactions ? 'Show fewer' : 'Show more'}
+                </button>
+              ) : null}
+            </div>
             <div className="table-wrap">
               <table>
                 <thead>
@@ -220,7 +242,7 @@ export default function WalletDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.transactions.slice(0, 20).map((tx) => (
+                  {data.transactions.slice(0, showAllTransactions ? 20 : 2).map((tx) => (
                     <tr key={tx.signature + tx.blockTime}>
                       <td><Pill label={tx.type} tone="muted" /></td>
                       <td>{formatAddress(tx.source)}</td>
