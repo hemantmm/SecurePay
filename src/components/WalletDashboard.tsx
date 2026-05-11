@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from 'react';
+import { CSSProperties, FormEvent, useMemo, useState } from 'react';
 import type { WalletAnalysisResponse } from '@/lib/trustscore';
 
 function formatSol(lamports: number) {
@@ -57,6 +57,7 @@ export default function WalletDashboard() {
   const [data, setData] = useState<WalletAnalysisResponse | null>(null);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
   const [showAllTransactions, setShowAllTransactions] = useState(false);
+  const [pointer, setPointer] = useState({ x: 52, y: 24, active: false });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -94,8 +95,32 @@ export default function WalletDashboard() {
         : 'danger'
     : 'muted';
 
+  const shellStyle = {
+    '--pointer-x': `${pointer.x}%`,
+    '--pointer-y': `${pointer.y}%`,
+    '--pointer-opacity': pointer.active ? 1 : 0,
+  } as CSSProperties;
+
   return (
-    <main className="shell">
+    <main
+      className="shell"
+      style={shellStyle}
+      onPointerMove={(event) => {
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const x = ((event.clientX - bounds.left) / bounds.width) * 100;
+        const y = ((event.clientY - bounds.top) / bounds.height) * 100;
+        setPointer({
+          x: Math.max(0, Math.min(100, x)),
+          y: Math.max(0, Math.min(100, y)),
+          active: true,
+        });
+      }}
+      onPointerLeave={() => setPointer((current) => ({ ...current, active: false }))}
+    >
+      <div className="scene-glow scene-glow-a" aria-hidden="true" />
+      <div className="scene-glow scene-glow-b" aria-hidden="true" />
+      <div className="scene-grid" aria-hidden="true" />
+
       <section className="hero">
         <div className="badge">AI + Web3 wallet risk engine</div>
         <h1>TrustScore for Wallets</h1>
