@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
 import { FormEvent, useMemo, useState } from 'react';
 import type { WalletAnalysisResponse } from '@/lib/trustscore';
+import { sampleWalletResponse } from '@/lib/trustscore';
 
 function formatSol(lamports: number) {
   return `${(lamports / 1e9).toFixed(4)} SOL`;
@@ -86,6 +87,14 @@ export default function WalletDashboard() {
     }
   };
 
+  const handleLoadSample = () => {
+    const sample = sampleWalletResponse();
+    setAddress(sample.address.slice(0, 44));
+    setData(sample as WalletAnalysisResponse);
+    setShowAllRecommendations(false);
+    setShowAllTransactions(false);
+  };
+
   const scoreTone = data
     ? data.trustScore.riskLevel === 'low'
       ? 'success'
@@ -104,17 +113,25 @@ export default function WalletDashboard() {
           scores anomaly patterns, and highlights scam-like behavior.
         </p>
 
-        <form className="analyze-form" onSubmit={handleSubmit}>
+        <form className="analyze-form" onSubmit={handleSubmit} aria-label="Analyze wallet form">
+          <label className="visually-hidden" htmlFor="wallet-address">Wallet address</label>
           <input
+            id="wallet-address"
             type="text"
             placeholder="Enter Solana wallet address"
             value={address}
             onChange={(event) => setAddress(event.target.value)}
             spellCheck={false}
+            aria-label="Solana wallet address"
           />
-          <button type="submit" disabled={loading || !address.trim()}>
-            {loading ? 'Analyzing...' : 'Analyze wallet'}
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button type="submit" disabled={loading || !address.trim()}>
+              {loading ? 'Analyzing...' : 'Analyze wallet'}
+            </button>
+            <button type="button" className="section-toggle" onClick={handleLoadSample}>
+              Preview sample
+            </button>
+          </div>
         </form>
 
         <div className="helper-row">
