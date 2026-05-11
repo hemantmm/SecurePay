@@ -2,7 +2,6 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import type { WalletAnalysisResponse } from '@/lib/trustscore';
-import { sampleWalletResponse } from '@/lib/trustscore';
 
 function formatSol(lamports: number) {
   return `${(lamports / 1e9).toFixed(4)} SOL`;
@@ -87,14 +86,6 @@ export default function WalletDashboard() {
     }
   };
 
-  const handleLoadSample = () => {
-    const sample = sampleWalletResponse();
-    setAddress(sample.address.slice(0, 44));
-    setData(sample as WalletAnalysisResponse);
-    setShowAllRecommendations(false);
-    setShowAllTransactions(false);
-  };
-
   const scoreTone = data
     ? data.trustScore.riskLevel === 'low'
       ? 'success'
@@ -127,9 +118,6 @@ export default function WalletDashboard() {
           <div style={{ display: 'flex', gap: 10 }}>
             <button type="submit" disabled={loading || !address.trim()}>
               {loading ? 'Analyzing...' : 'Analyze wallet'}
-            </button>
-            <button type="button" className="section-toggle" onClick={handleLoadSample}>
-              Preview sample
             </button>
           </div>
         </form>
