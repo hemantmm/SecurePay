@@ -1,6 +1,27 @@
 # TrustScore — Solana Wallet Trust Scorer
 
-TrustScore is a platform that analysis Solana address on the blockchain to help people detect fraud, rug pulls, and any other malicious activities. TrustScore offers real-time risk assessment of any Solana wallet with a trust score between 0 and 100.
+TrustScore is a platform that analyzes Solana addresses on the blockchain to help people detect fraud, rug pulls, and any other malicious activities. TrustScore provides a real-time risk assessment of any Solana address, assigning a trust score ranging from 0 to 100.
+
+## How the trust score is detected
+
+It uses deterministic scoring logic in `src/lib/trustscore.ts` based on wallet behavior.
+
+1. The backend fetches up to 100 transactions for the wallet from Helius.
+2. Each raw transaction is normalized into a simpler shape: type, source, destination, amount, fee, status, and timestamp.
+3. The analyzer runs two rule-based checks:
+   - **Anomaly detection** looks for rapid activity, unusually large transfers, failed transactions, suspicious repeated destinations, and new-wallet risk.
+   - **Malicious behavior detection** looks for patterns associated with rug pulls, honeypots, pump-and-dump activity, scams, money laundering, and bot-like behavior.
+4. The final trust score is calculated with a weighted formula:
+
+```text
+trustScore = 100 - (maliciousScore * 0.6 + anomalyScore * 0.4)
+```
+
+5. The result is clamped to a minimum of 0 and mapped to a risk level:
+   - `low` for stronger wallets
+   - `medium` for moderate risk
+   - `high` for risky wallets
+   - `critical` for the most suspicious wallets
 
 
 ## Quickstart
