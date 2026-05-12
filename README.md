@@ -1,37 +1,43 @@
-# TrustScore for Wallets
+# TrustScore — Solana Wallet Trust Scorer
 
-AI-powered Solana wallet trust scoring dashboard built with Next.js.
+TrustScore is a platform that analysis Solana address on the blockchain to help people detect fraud, rug pulls, and any other malicious activities. TrustScore offers real-time risk assessment of any Solana wallet with a trust score between 0 and 100.
 
-## What it does
-- Fetches wallet transactions through Helius
-- Normalizes Solana transaction history
-- Scores risk using anomaly detection and scam heuristics
-- Shows a trust score from 0 to 100
-- Displays recommendations and recent transactions
 
-## Setup
-1. Install Node.js 18+.
-2. Install dependencies:
+## Quickstart
+Prerequisites:
+- Node.js 18+ and npm or pnpm
 
-   ```bash
-   npm install
-   ```
+1. Install dependencies
 
-3. The Helius API key is already placed in `.env.local` for this workspace.
-4. Start the app:
+```bash
+npm install
+```
 
-   ```bash
-   npm run dev
-   ```
+2. Add environment variables
 
-5. Open `http://localhost:3000`.
+Create a `.env.local` in the project root with your Helius API key:
 
-## Project structure
-- `src/app/page.tsx` - entry page
-- `src/components/WalletDashboard.tsx` - frontend dashboard
-- `src/app/api/analyze-wallet/route.ts` - backend API route
-- `src/lib/trustscore.ts` - transaction parsing and scoring logic
+```env
+HELIUS_API_KEY=your_helius_api_key_here
+```
 
-## Notes
-- The backend API route keeps the Helius key server-side.
-- The scoring logic is heuristic, so it is demo-friendly and fast enough to ship by tomorrow.
+(Keep secrets out of version control.)
+
+3. Run the app locally
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:3000` to view the dashboard.
+
+## Scripts
+- `npm run dev` — start the dev server
+- `npm run build` — build for production
+- `npm start` — start the production server (after `build`)
+
+## Development notes
+- The Helius key should remain server-side; do not expose it in client bundles.
+- Scoring is heuristic and intended for demonstration — review and extend before any production use.
+
+---
